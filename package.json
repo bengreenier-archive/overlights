@@ -1,0 +1,20 @@
+{
+  "name": "overlights",
+  "version": "0.1.0",
+  "description": "reactive overwatch lighting",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "overwatch",
+    "lighting"
+  ],
+  "author": "Ben Greenier",
+  "license": "MIT",
+  "dependencies": {
+    "asynckeystate": "0.0.2",
+    "huejay": "^1.7.0",
+    "proxy-config": "^0.2.0"
+  }
+}
