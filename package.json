@@ -14,7 +14,9 @@
   "license": "MIT",
   "dependencies": {
     "asynckeystate": "0.0.2",
+    "color-space": "^1.14.7",
     "huejay": "^1.7.0",
-    "proxy-config": "^0.2.0"
+    "proxy-config": "^0.2.0",
+    "range-fit": "^0.1.1"
   }
 }

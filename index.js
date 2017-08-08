@@ -1,6 +1,9 @@
 const config = require('proxy-config')(process.argv[2] || '.lights.conf')
 const huejay = require('huejay')
 const aks = require('asynckeystate')
+const rgb = require('color-space/rgb')
+const hsl = require('color-space/hsl')
+const rangeFit = require('range-fit')
 
 if (!config.color) {
     return console.error("please set config values for color")
@@ -53,6 +56,10 @@ huejay.discover()
 
                 console.log("default light state captured")
 
+                Object.values(lights).forEach((l) => {
+                    console.log(l.xy);
+                })
+
                 return [client, lights]
             })
     })
@@ -81,6 +88,11 @@ huejay.discover()
 
                     client.lights.save(light)
                         .then(() => {
+                            return new Promise((resolve, reject) => {
+                                setTimeout(() => {resolve(); }, 1500)
+                            })
+                        })
+                        .then(() => {
                             for (let prop in state) {
                                 light[prop] = state[prop]
                             }
@@ -88,7 +100,8 @@ huejay.discover()
                             light.transitionTime = 2
 
                             return client.lights.save(light)
-                        }, (err) => {
+                        })
+                        .catch((err) => {
                             console.error(`single light (${light.name}) error: ${err}`)
                         })
                 })
