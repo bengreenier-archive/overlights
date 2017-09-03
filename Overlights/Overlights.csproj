@@ -48,5 +48,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RzChroma.Managed\RzChroma.Managed.csproj">
+      <Project>{EF02C974-F3FB-45AE-8296-5E2E45199BB5}</Project>
+      <Name>RzChroma.Managed</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

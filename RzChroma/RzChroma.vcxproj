@@ -132,9 +132,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application.h" />
     <ClInclude Include="RzChromaSDKDefines.h" />
     <ClInclude Include="RzChromaSDKTypes.h" />
     <ClInclude Include="RzErrors.h" />
