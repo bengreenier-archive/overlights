@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RzChroma.Managed;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -31,15 +32,16 @@ namespace Overlights
 
             client.Connect();
 
-            using (var sr = new RzChroma.Managed.RzChromaStreamReader(client))
+            using (var sr = new RzChromaStreamReader(client))
             {
                 while (client.IsConnected)
                 {
                     var msg = sr.ReadMessage();
 
-                    if (msg.Type == RzChroma.Managed.NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM)
+                    if (msg.Type == NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM ||
+                        msg.Type == NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM_KEY)
                     {
-                        var data = msg as RzChroma.Managed.RzChromaKeyboardCustomData;
+                        var data = msg as RzChromaKeyboardCustomData;
 
                         for (var i = 0; i < data.ColorMap.Length; i++)
                         {
@@ -57,12 +59,12 @@ namespace Overlights
 
         private void ResizeTableToRuntimeRequirements()
         {
-            this.keyLayout.RowCount = RzChroma.Managed.NativeLayouts.RZKEYBOARD_MAX_ROWS;
-            this.keyLayout.ColumnCount = RzChroma.Managed.NativeLayouts.RZKEYBOARD_MAX_COLUMNS;
+            this.keyLayout.RowCount = NativeLayouts.RZKEYBOARD_MAX_ROWS;
+            this.keyLayout.ColumnCount = NativeLayouts.RZKEYBOARD_MAX_COLUMNS;
 
-            for (var i = 0; i < RzChroma.Managed.NativeLayouts.RZKEYBOARD_MAX_ROWS; i++)
+            for (var i = 0; i < NativeLayouts.RZKEYBOARD_MAX_ROWS; i++)
             {
-                for (var j = 0; j < RzChroma.Managed.NativeLayouts.RZKEYBOARD_MAX_COLUMNS; j++)
+                for (var j = 0; j < NativeLayouts.RZKEYBOARD_MAX_COLUMNS; j++)
                 {
                     var defaultPictBox = new PictureBox
                     {
