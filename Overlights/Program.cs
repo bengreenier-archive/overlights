@@ -1,33 +1,22 @@
-﻿using RzChroma.Managed;
-using System;
-using System.IO;
-using System.IO.Pipes;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Overlights
 {
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
         {
-            var stream = new NamedPipeClientStream(".", "RzChromaData", PipeDirection.In);
-
-            Console.Write("Connecting...");
-
-            stream.Connect();
-
-            Console.WriteLine("Connected");
-            using (var sr = new RzChromaStreamReader(stream))
-            {
-                while (stream.IsConnected)
-                {
-                    foreach (var msg in sr.ReadMessage())
-                    {
-                        Console.WriteLine($"{msg.key}: {msg.r}, {msg.g}, {msg.b}, {msg.a}");
-                    }
-                }
-            }
-
-            stream.Close();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainPage());
         }
     }
 }

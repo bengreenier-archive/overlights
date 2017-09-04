@@ -152,13 +152,50 @@ namespace RzChroma.Managed
             CHROMA_INVALID              //!< Invalid effect.
         }
 
-        public struct KeyColor
+        public enum RZKEYBOARDBREATHINGTYPE
         {
-            public RZKEY key;
-            public sbyte r;
-            public sbyte g;
-            public sbyte b;
-            public sbyte a;
+            ONE_COLOR = 1,  //!< 1 color (Only fill Color1).
+            TWO_COLORS,     //!< 2 colors.
+            RANDOM_COLORS   //!< Random colors
         }
+
+        public enum RZKEYBOARDREACTIVEDURATION
+        {
+            DURATION_SHORT = 1, //!< Short duration.
+            DURATION_MEDIUM,    //!< Medium duration.
+            DURATION_LONG       //!< Long duration.
+        }
+
+        public enum RZKEYBOARDSTARLIGHTTYPE
+        {
+            TWO_COLORS = 1, //!< 2 colors.
+            RANDOM_COLORS   //!< Random colors
+        }
+
+        public enum RZKEYBOARDSTARLIGHTDURATION
+        {
+            DURATION_SHORT = 1, //!< Short duration.
+            DURATION_MEDIUM,    //!< Medium duration.
+            DURATION_LONG       //!< Long duration.
+        }
+
+        public enum RZKEYBOARDWAVEDIRECTION
+        {
+            DIRECTION_LEFT_TO_RIGHT = 1,    //!< Left to right.
+            DIRECTION_RIGHT_TO_LEFT,        //!< Right to left.
+            DIRECTION_FRONT_TO_BACK,        //!< Front to back
+            DIRECTION_BACK_TO_FRONT         //!< Back top front
+        }
+
+        public struct Color
+        {
+            public int R;
+            public int G;
+            public int B;
+            public int A;
+        }
+
+        public static readonly int RZKEYBOARD_MAX_ROWS = 6;
+        public static readonly int RZKEYBOARD_MAX_COLUMNS = 22;
     }
 }

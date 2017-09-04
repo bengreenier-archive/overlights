@@ -8,6 +8,7 @@
 
 #include <windows.h>
 
+#include "constants.h"
 #include "helpers.h"
 #include "logger.h"
 

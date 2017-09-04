@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 
+#include "constants.h"
+
 #ifndef LOGGER_PATH
 #define LOGGER_PATH ""
 #endif

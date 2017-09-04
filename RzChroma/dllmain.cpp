@@ -6,14 +6,6 @@
 
 #include "application.h"
 
-struct GUIDComparer {
-	bool operator()(const GUID & Left, const GUID & Right) const
-	{
-		// comparison logic goes here
-		return memcmp(&Left, &Right, sizeof(Right)) < 0;
-	}
-};
-
 // dllmain is soley responsible for the lifecycle of the application
 // plugin logic is managed by the Application
 static Application* app = nullptr;

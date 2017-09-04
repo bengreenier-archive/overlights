@@ -6,6 +6,7 @@
 
 #include <windows.h>
 
+#include "constants.h"
 #include "RzErrors.h"
 #include "RzChromaSDKTypes.h"
 #include "RzChromaSDKDefines.h"

@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RzChromaKeyboardCustomData.cs" />
+    <Compile Include="RzChromaKeyboardData.cs" />
     <Compile Include="RzChromaStreamReader.cs" />
     <Compile Include="NativeLayouts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

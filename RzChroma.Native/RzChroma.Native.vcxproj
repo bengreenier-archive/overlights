@@ -118,6 +118,7 @@
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="binary_pipe.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="RzChromaSDKDefines.h" />
