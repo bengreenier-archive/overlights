@@ -20,34 +20,62 @@ namespace RzChroma.Managed
 
         public IReadOnlyList<NativeLayouts.KeyColor> ReadMessage()
         {
-            // key count:
-            var totalKeys = this.reader.ReadInt32();
-            var keys = new List<NativeLayouts.KeyColor>();
+            var result = new List<NativeLayouts.KeyColor>();
+            var messageType = (NativeLayouts.RZKEYBOARDTYPE) this.reader.ReadInt32();
+
+            var messageContents = this.reader.ReadBytes(4320);
+
+            Console.WriteLine(messageType);
             
-            for (var i = 0; i < totalKeys; i++)
+            switch (messageType)
             {
-                // key:
-                var keyNum = this.reader.ReadInt32();
-                var keyEnum = (NativeLayouts.RZKEY)keyNum;
-
-                // r, g, b, a
-                var rNum = this.reader.ReadSByte();
-                var gNum = this.reader.ReadSByte();
-                var bNum = this.reader.ReadSByte();
-                var aNum = this.reader.ReadSByte();
-
-                // done:
-                keys.Add(new NativeLayouts.KeyColor()
-                {
-                    key = keyEnum,
-                    r = rNum,
-                    g = gNum,
-                    b = bNum,
-                    a = aNum
-                });
+                case NativeLayouts.RZKEYBOARDTYPE.CHROMA_BREATHING:
+                case NativeLayouts.RZKEYBOARDTYPE.CHROMA_REACTIVE:
+                    this.reader.ReadInt32();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    break;
+                case NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM:
+                case NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM_KEY:
+                    var maxRow = this.reader.ReadInt32();
+                    var maxCol = this.reader.ReadInt32();
+                    for (var i = 0; i < maxRow; i++)
+                    {
+                        for (var j = 0; j < maxCol; j++)
+                        {
+                            this.reader.ReadByte();
+                            this.reader.ReadByte();
+                            this.reader.ReadByte();
+                            this.reader.ReadByte();
+                        }
+                    }
+                    break;
+                case NativeLayouts.RZKEYBOARDTYPE.CHROMA_STARLIGHT:
+                    this.reader.ReadInt32();
+                    this.reader.ReadInt32();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    break;
+                case NativeLayouts.RZKEYBOARDTYPE.CHROMA_STATIC:
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    this.reader.ReadByte();
+                    break;
+                case NativeLayouts.RZKEYBOARDTYPE.CHROMA_WAVE:
+                    this.reader.ReadInt32();
+                    break;
             }
 
-            return keys;
+            return result;
         }
 
         #region IDisposable Support

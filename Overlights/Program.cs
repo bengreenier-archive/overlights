@@ -16,7 +16,6 @@ namespace Overlights
             stream.Connect();
 
             Console.WriteLine("Connected");
-
             using (var sr = new RzChromaStreamReader(stream))
             {
                 while (stream.IsConnected)

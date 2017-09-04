@@ -1,18 +1,26 @@
 #pragma once
 
-#include <windows.h>
 #include <string>
 #include <map>
 #include <fstream>
 
+#include <windows.h>
+
 #include "RzErrors.h"
 #include "RzChromaSDKTypes.h"
 #include "RzChromaSDKDefines.h"
+#include "logger.h"
+#include "helpers.h"
+#include "binary_pipe.h"
+
+#ifndef APP_PIPE_NAME
+#define APP_PIPE_NAME "RzChromaData"
+#endif
 
 class Application
 {
 public:
-	Application(std::string pipeName = "RzChromaData");
+	Application(std::string pipeName = APP_PIPE_NAME);
 	~Application();
 
 	RZRESULT CreateEffect(RZDEVICEID DeviceId, ChromaSDK::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId);
@@ -25,18 +33,7 @@ public:
 	RZRESULT DeleteEffect(RZEFFECTID EffectId);
 	RZRESULT QueryDevice(RZDEVICEID DeviceId, ChromaSDK::DEVICE_INFO_TYPE &DeviceInfo);
 
-	enum LogLevel
-	{
-		L_DEBUG,
-		L_INFO,
-		L_WARNING,
-		L_ERROR
-	};
-
-	std::ofstream& Log(LogLevel level = L_INFO);
-	const char* GetLastErrorAsString();
 private:
-	HANDLE m_hPipe;
-	std::ofstream m_log;
+	BinaryPipe m_pipe;
 };
 

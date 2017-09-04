@@ -1,3 +1,5 @@
+#include <mutex>
+
 #include "RzChromaSDKDefines.h"
 #include "RzChromaSDKTypes.h"
 #include "RzErrors.h"
@@ -15,6 +17,7 @@ struct GUIDComparer {
 // dllmain is soley responsible for the lifecycle of the application
 // plugin logic is managed by the Application
 static Application* app = nullptr;
+static std::mutex appMutex;
 
 BOOL WINAPI DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
@@ -32,11 +35,13 @@ extern "C" {
 	{
 		if (app == nullptr)
 		{
+			std::lock_guard<std::mutex> appGuard(appMutex);
+
 			try
 			{
 				app = new Application();
 			}
-			catch (const std::exception& ex)
+			catch (const std::exception&)
 			{
 				app = nullptr;
 				return RZRESULT_FAILED;
