@@ -19,6 +19,8 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 {
 	LOG(L_INFO) << __FUNCTION__ << ": " << Effect;
 
+	m_pipe.WriteInt(Application::DataType::Keyboard);
+
 	if (Effect == ChromaSDK::Keyboard::EFFECT_TYPE::CHROMA_BREATHING)
 	{
 		ChromaSDK::Keyboard::BREATHING_EFFECT_TYPE *effect = (struct ChromaSDK::Keyboard::BREATHING_EFFECT_TYPE *)pParam;

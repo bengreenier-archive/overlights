@@ -1,7 +1,9 @@
 ﻿using Q42.HueApi;
 using Q42.HueApi.ColorConverters;
 using Q42.HueApi.ColorConverters.Original;
-using RzChroma.Managed;
+using RzChroma;
+using RzChroma.Data;
+using RzChroma.Data.Keyboard;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -75,18 +77,23 @@ namespace Overlights
                 {
                     var msg = sr.ReadMessage();
 
-                    if (msg.Type == NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM ||
-                        msg.Type == NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM_KEY)
+                    if (msg.Type == DataType.Keyboard)
                     {
-                        var data = msg as RzChromaKeyboardCustomData;
+                        var data = msg.As<IKeyboardData>();
 
-                        for (var i = 0; i < data.ColorMap.Length; i++)
+                        if (data.EventType == KeyboardDataType.CHROMA_CUSTOM ||
+                            data.EventType == KeyboardDataType.CHROMA_CUSTOM_KEY)
                         {
-                            for (var j = 0; j < data.ColorMap[i].Length; j++)
+                            var evt = data.As<CustomKeyboardData>();
+
+                            for (var i = 0; i < evt.ColorMap.Length; i++)
                             {
-                                var color = data.ColorMap[i][j];
-                                var control = this.keyLayout.GetControlFromPosition(j, i);
-                                control.BackColor = Color.FromArgb(255, color.R, color.G, color.B);
+                                for (var j = 0; j < evt.ColorMap[i].Length; j++)
+                                {
+                                    var color = evt.ColorMap[i][j];
+                                    var control = this.keyLayout.GetControlFromPosition(j, i);
+                                    control.BackColor = System.Drawing.Color.FromArgb(255, color.R, color.G, color.B);
+                                }
                             }
                         }
                     }
@@ -96,12 +103,12 @@ namespace Overlights
 
         private void ResizeTableToRuntimeRequirements()
         {
-            this.keyLayout.RowCount = NativeLayouts.RZKEYBOARD_MAX_ROWS;
-            this.keyLayout.ColumnCount = NativeLayouts.RZKEYBOARD_MAX_COLUMNS;
+            this.keyLayout.RowCount = CustomKeyboardData.MaxRows;
+            this.keyLayout.ColumnCount = CustomKeyboardData.MaxCols;
 
-            for (var i = 0; i < NativeLayouts.RZKEYBOARD_MAX_ROWS; i++)
+            for (var i = 0; i < CustomKeyboardData.MaxRows; i++)
             {
-                for (var j = 0; j < NativeLayouts.RZKEYBOARD_MAX_COLUMNS; j++)
+                for (var j = 0; j < CustomKeyboardData.MaxCols; j++)
                 {
                     var defaultPictBox = new PictureBox
                     {

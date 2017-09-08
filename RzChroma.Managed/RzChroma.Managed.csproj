@@ -7,7 +7,7 @@
     <ProjectGuid>{EF02C974-F3FB-45AE-8296-5E2E45199BB5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RzChroma.Managed</RootNamespace>
+    <RootNamespace>RzChroma</RootNamespace>
     <AssemblyName>RzChroma.Managed</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -40,8 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RzChromaKeyboardCustomData.cs" />
-    <Compile Include="RzChromaKeyboardData.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="Data\DataMessageParsers.cs" />
+    <Compile Include="Data\IData.cs" />
+    <Compile Include="Data\DataType.cs" />
+    <Compile Include="Data\Keyboard\CustomKeyboardData.cs" />
+    <Compile Include="Data\Keyboard\IKeyboardData.cs" />
+    <Compile Include="Data\Keyboard\KeyboardDataType.cs" />
     <Compile Include="RzChromaStreamReader.cs" />
     <Compile Include="NativeLayouts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

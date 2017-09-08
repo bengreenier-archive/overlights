@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RzChroma.Managed
 {
+    [Obsolete("This needs to go")]
     public static class NativeLayouts
     {
         // From RzChromaSDKTypes.h

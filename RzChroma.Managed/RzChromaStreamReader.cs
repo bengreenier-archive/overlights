@@ -1,17 +1,28 @@
-﻿using System;
+﻿using RzChroma.Data;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RzChroma.Managed
+namespace RzChroma
 {
+    /// <summary>
+    /// Reads RzChroma binary data from a given stream
+    /// </summary>
+    /// <remarks>
+    /// This closes the stream on <see cref="Dispose"/>
+    /// </remarks>
     public class RzChromaStreamReader : IDisposable
     {
         private BinaryReader reader;
         private Stream stream;
 
+        /// <summary>
+        /// Default ctor
+        /// </summary>
+        /// <param name="stream">the stream to read from</param>
         public RzChromaStreamReader(Stream stream)
         {
             this.stream = stream;
@@ -19,75 +30,28 @@ namespace RzChroma.Managed
             this.reader = new BinaryReader(stream);
         }
 
-        public RzChromaKeyboardData ReadMessage()
+        /// <summary>
+        /// Blocking IO, reads a <see cref="IData"/> message from the stream
+        /// </summary>
+        /// <remarks>
+        /// Use <see cref="IDataExtensions.As{TCast}(IData)"/> to cast the data
+        /// </remarks>
+        /// <returns>data that makes up the message, or null</returns>
+        public IData ReadMessage()
         {
-            RzChromaKeyboardData data = null;
+            IData data = null;
 
             try
             {
-                var messageType = (NativeLayouts.RZKEYBOARDTYPE)this.reader.ReadInt32();
-                
-                switch (messageType)
-                {
-                    case NativeLayouts.RZKEYBOARDTYPE.CHROMA_BREATHING:
-                    case NativeLayouts.RZKEYBOARDTYPE.CHROMA_REACTIVE:
-                        this.reader.ReadInt32();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        break;
-                    case NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM:
-                    case NativeLayouts.RZKEYBOARDTYPE.CHROMA_CUSTOM_KEY:
-                        var maxRow = this.reader.ReadInt32();
-                        var maxCol = this.reader.ReadInt32();
-                        var colorMap = new NativeLayouts.Color[maxRow][];
-                        for (var i = 0; i < maxRow; i++)
-                        {
-                            colorMap[i] = new NativeLayouts.Color[maxCol];
-                            for (var j = 0; j < maxCol; j++)
-                            {
-                                colorMap[i][j] = new NativeLayouts.Color()
-                                {
-                                    R = this.reader.ReadByte(),
-                                    G = this.reader.ReadByte(),
-                                    B = this.reader.ReadByte(),
-                                    A = this.reader.ReadByte()
-                                };
-                            }
-                        }
-                        data = new RzChromaKeyboardCustomData()
-                        {
-                            Type = messageType,
-                            ColorMap = colorMap
-                        };
-                        break;
-                    case NativeLayouts.RZKEYBOARDTYPE.CHROMA_STARLIGHT:
-                        this.reader.ReadInt32();
-                        this.reader.ReadInt32();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        break;
-                    case NativeLayouts.RZKEYBOARDTYPE.CHROMA_STATIC:
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        this.reader.ReadByte();
-                        break;
-                    case NativeLayouts.RZKEYBOARDTYPE.CHROMA_WAVE:
-                        this.reader.ReadInt32();
-                        break;
-                }
+                data = DataMessageParsers.Root(this.reader);
+            }
+            catch (KeyNotFoundException)
+            {
+                // swallow (no parser)
             }
             catch (EndOfStreamException)
             {
-                // swallow
+                // swallow (stream closed)
             }
 
             return data;
