@@ -71,7 +71,7 @@ void BinaryPipe::WriteByte(unsigned char value, bool flush)
 
 void BinaryPipe::WriteString(const std::string value, bool flush)
 {
-	for (auto i = 0; i < value.length(); i++)
+	for (size_t i = 0; i < value.length(); ++i)
 	{
 		m_buffer.push_back(value[i]);
 	}

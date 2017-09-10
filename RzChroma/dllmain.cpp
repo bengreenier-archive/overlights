@@ -1,5 +1,6 @@
 #include <mutex>
 
+#include "targetver.h"
 #include "RzChromaSDKDefines.h"
 #include "RzChromaSDKTypes.h"
 #include "RzErrors.h"

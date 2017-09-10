@@ -59,15 +59,15 @@ namespace RzChroma.Data
         /// <summary>
         /// Map of parser logic, used by <see cref="Root(BinaryReader)"/>
         /// </summary>
-        private static readonly Dictionary<Keyboard.KeyboardDataType, Func<BinaryReader, Keyboard.IKeyboardData>> Parsers = new Dictionary<Keyboard.KeyboardDataType, Func<BinaryReader, Keyboard.IKeyboardData>>()
+        private static readonly Dictionary<KeyboardDataType, Func<BinaryReader, IKeyboardData>> Parsers = new Dictionary<KeyboardDataType, Func<BinaryReader, IKeyboardData>>()
         {
-            { KeyboardDataType.CHROMA_REACTIVE, ReactiveAndBreathingTemp },
-            { KeyboardDataType.CHROMA_BREATHING, ReactiveAndBreathingTemp },
+            { KeyboardDataType.CHROMA_REACTIVE, Reactive },
+            { KeyboardDataType.CHROMA_BREATHING, Breathing },
             { KeyboardDataType.CHROMA_CUSTOM, Custom },
             { KeyboardDataType.CHROMA_CUSTOM_KEY, Custom },
-            { KeyboardDataType.CHROMA_STARLIGHT, StarlightTemp },
-            { KeyboardDataType.CHROMA_STATIC, StaticTemp },
-            { KeyboardDataType.CHROMA_WAVE, WaveTemp }
+            { KeyboardDataType.CHROMA_STARLIGHT, Starlight },
+            { KeyboardDataType.CHROMA_STATIC, Static },
+            { KeyboardDataType.CHROMA_WAVE, Wave }
         };
         
         /// <summary>
@@ -80,6 +80,7 @@ namespace RzChroma.Data
             var maxRow = reader.ReadInt32();
             var maxCol = reader.ReadInt32();
             var colorMap = new Color[maxRow][];
+
             for (var i = 0; i < maxRow; i++)
             {
                 colorMap[i] = new Color[maxCol];
@@ -94,83 +95,118 @@ namespace RzChroma.Data
                     };
                 }
             }
-            return new Keyboard.CustomKeyboardData()
+
+            return new CustomKeyboardData()
             {
                 ColorMap = colorMap
             };
         }
 
         /// <summary>
-        /// Temporary parser for reactive and breathing
+        /// Parser for reactive key data
         /// </summary>
-        /// <remarks>
-        /// This is temporary cause it does nothing
-        /// </remarks>
         /// <param name="reader">a binary reader to parse from</param>
-        /// <returns>null</returns>
-        private static IKeyboardData ReactiveAndBreathingTemp(BinaryReader reader)
+        /// <returns>the <see cref="ReactiveKeyboardData"/></returns>
+        private static IKeyboardData Reactive(BinaryReader reader)
         {
-            reader.ReadInt32();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-
-            return null;
+            return new ReactiveKeyboardData()
+            {
+                Duration = (ReactiveKeyboardData.DurationType)reader.ReadInt32(),
+                Color = new Color()
+                {
+                    R = reader.ReadByte(),
+                    G = reader.ReadByte(),
+                    B = reader.ReadByte(),
+                    A = reader.ReadByte()
+                }
+            };
         }
 
         /// <summary>
-        /// Temporary parser for starlight
+        /// Parser for breathing key data
         /// </summary>
-        /// <remarks>
-        /// This is temporary cause it does nothing
-        /// </remarks>
         /// <param name="reader">a binary reader to parse from</param>
-        /// <returns>null</returns>
-        private static IKeyboardData StarlightTemp(BinaryReader reader)
+        /// <returns>the <see cref="BreathingKeyboardData"/></returns>
+        private static IKeyboardData Breathing(BinaryReader reader)
         {
-            reader.ReadInt32();
-            reader.ReadInt32();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-
-            return null;
+            return new BreathingKeyboardData()
+            {
+                BreathingType = (BreathingKeyboardData.BreathingEffect)reader.ReadInt32(),
+                ColorOne = new Color()
+                {
+                    R = reader.ReadByte(),
+                    G = reader.ReadByte(),
+                    B = reader.ReadByte(),
+                    A = reader.ReadByte()
+                },
+                ColorTwo = new Color()
+                {
+                    R = reader.ReadByte(),
+                    G = reader.ReadByte(),
+                    B = reader.ReadByte(),
+                    A = reader.ReadByte()
+                }
+            };
+        }
+        
+        /// <summary>
+        /// Parser for starlight
+        /// </summary>
+        /// <param name="reader">a binary reader to parse from</param>
+        /// <returns>the <see cref="StarlightKeyboardData"/></returns>
+        private static IKeyboardData Starlight(BinaryReader reader)
+        {
+            return new StarlightKeyboardData()
+            {
+                StarlightType = (StarlightKeyboardData.StarlightEffect)reader.ReadInt32(),
+                Duration = (StarlightKeyboardData.DurationType)reader.ReadInt32(),
+                ColorOne = new Color()
+                {
+                    R = reader.ReadByte(),
+                    G = reader.ReadByte(),
+                    B = reader.ReadByte(),
+                    A = reader.ReadByte()
+                },
+                ColorTwo = new Color()
+                {
+                    R = reader.ReadByte(),
+                    G = reader.ReadByte(),
+                    B = reader.ReadByte(),
+                    A = reader.ReadByte()
+                }
+            };
         }
 
         /// <summary>
-        /// Temporary parser for static
+        /// Parser for static
         /// </summary>
-        /// <remarks>
-        /// This is temporary cause it does nothing
-        /// </remarks>
         /// <param name="reader">a binary reader to parse from</param>
-        /// <returns>null</returns>
-        private static IKeyboardData StaticTemp(BinaryReader reader)
+        /// <returns>the <see cref="StaticKeyboardData"/></returns>
+        private static IKeyboardData Static(BinaryReader reader)
         {
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
+            return new StaticKeyboardData()
+            {
+                Color = new Color()
+                {
+                    R = reader.ReadByte(),
+                    G = reader.ReadByte(),
+                    B = reader.ReadByte(),
+                    A = reader.ReadByte()
+                }
+            };
         }
 
         /// <summary>
-        /// Temporary parser for wave
+        /// Parser for wave
         /// </summary>
-        /// <remarks>
-        /// This is temporary cause it does nothing
-        /// </remarks>
         /// <param name="reader">a binary reader to parse from</param>
-        /// <returns>null</returns>
-        private static IKeyboardData WaveTemp(BinaryReader reader)
+        /// <returns>the <see cref="WaveKeyboardData"/></returns>
+        private static IKeyboardData Wave(BinaryReader reader)
         {
-            reader.ReadInt32();
-
+            return new WaveKeyboardData()
+            {
+                Direction = (WaveKeyboardData.DirectionType)reader.ReadInt32()
+            };
         }
     }
 }

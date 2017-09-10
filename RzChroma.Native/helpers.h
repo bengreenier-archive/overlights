@@ -6,6 +6,10 @@
 
 namespace
 {
+	/// <summary>
+	/// Returns the <c>GetLastError()</c> result as a message string
+	/// <summary>
+	/// <returns>the message string</returns>
 	const char* GetLastErrorAsString()
 	{
 		//Get the error message, if any.

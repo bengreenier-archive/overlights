@@ -19,6 +19,7 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 {
 	LOG(L_INFO) << __FUNCTION__ << ": " << Effect;
 
+	// note: changes in order of the m_pipe writes requires changes to the csharp wrapper as well
 	m_pipe.WriteInt(Application::DataType::Keyboard);
 
 	if (Effect == ChromaSDK::Keyboard::EFFECT_TYPE::CHROMA_BREATHING)
@@ -285,6 +286,9 @@ RZRESULT Application::QueryDevice(RZDEVICEID DeviceId, ChromaSDK::DEVICE_INFO_TY
 {
 	LOG(L_INFO) << __FUNCTION__;
 
+	// only support 2 devices, one mouse and one keyboard
+	// as we extend this library to support more device types
+	// we'll likely want to expand these conditions
 	if (DeviceId == ChromaSDK::BLACKWIDOW_CHROMA)
 		DeviceInfo.DeviceType = ChromaSDK::DEVICE_INFO_TYPE::DeviceType::DEVICE_KEYBOARD;
 	else if (DeviceId == ChromaSDK::DEATHADDER_CHROMA)
