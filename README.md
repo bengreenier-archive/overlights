@@ -14,7 +14,7 @@ This allows you to have a reactive lighting setup that changes in realtime in re
 
 > You can read a more detailed walkthrough [here](./readme_data/detailed-setup.md).
 
-+ Download [the latest build](./releases/latest) and extract the `.zip`
++ Download [the latest build](https://github.com/bengreenier/overlights/releases/latest) and extract the `.zip`
 + Copy `*.dll` from `Build/` to the directory `Overwatch.exe` is in
 + Run `Overlights.exe` from `Build/`
 + Run `Overwatch.exe`
