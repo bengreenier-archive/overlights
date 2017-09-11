@@ -1,6 +1,6 @@
 ## How to set things up (detailed)
 
-+ Download [the latest build](./releases/latest) and extract the `.zip`
++ Download [the latest build](https://github.com/bengreenier/overlights/releases/latest) and extract the `.zip`
 
 ![step1](./step1.png)
 
