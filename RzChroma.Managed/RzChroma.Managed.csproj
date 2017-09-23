@@ -89,8 +89,8 @@
     <Compile Include="Data\Keyboard\StarlightKeyboardData.cs" />
     <Compile Include="Data\Keyboard\StaticKeyboardData.cs" />
     <Compile Include="Data\Keyboard\WaveKeyboardData.cs" />
+    <Compile Include="RzChromaPlugin.cs" />
     <Compile Include="RzChromaStreamReader.cs" />
-    <Compile Include="NativeLayouts.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

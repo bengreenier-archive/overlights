@@ -15,7 +15,15 @@
 #include "binary_pipe.h"
 
 #ifndef APP_PIPE_NAME
-#define APP_PIPE_NAME "RzChromaData"
+#define APP_PIPE_NAME "\\\\.\\pipe\\RzChromaData"
+#endif
+
+#ifndef APP_REG_ROOT_KEY
+#define APP_REG_ROOT_KEY "RzChromaData"
+#endif
+
+#ifndef APP_REG_ENABLED_KEY
+#define APP_REG_ENABLED_KEY "Enabled"
 #endif
 
 /// <summary>
@@ -31,7 +39,11 @@ public:
 	/// Default ctor
 	/// </summary>
 	/// <param name="pipeName">the name of a named pipe to which data will be written</param>
-	Application(std::string pipeName = APP_PIPE_NAME);
+	/// <param name="regRootKey">the name of the root registry key where app data is</param>
+	/// <param name="regEnabledKey">the name of the subkey for plugin enable/disable</param>
+	Application(std::string pipeName = APP_PIPE_NAME,
+		std::string regRootKey = APP_REG_ROOT_KEY,
+		std::string regEnabledKey = APP_REG_ENABLED_KEY);
 
 	/// <summary>
 	/// Default dtor
@@ -134,7 +146,21 @@ public:
 	/// <returns>operation status indicator</returns>
 	RZRESULT QueryDevice(RZDEVICEID DeviceId, ChromaSDK::DEVICE_INFO_TYPE &DeviceInfo);
 
+	/// <summary>
+	/// Is the plugin enabled in the registry
+	/// </summary>
+	bool IsEnabled() const;
+
 private:
+	/// <summary>
+	/// The root registry key
+	/// </summary>
+	std::string m_regRootKey;
+
+	/// <summary>
+	/// The enabled registry key
+	/// </summary>
+	std::string m_regEnabledKey;
 
 	/// <summary>
 	/// Internal <see cref="BinaryPipe"/> instance used for communication
