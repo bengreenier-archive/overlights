@@ -1,7 +1,11 @@
 #include "application.h"
 
-Application::Application(std::string pipeName) :
-	m_pipe(pipeName.c_str())
+Application::Application(std::string pipeName,
+	std::string regRootKey,
+	std::string regEnabledKey) :
+	m_pipe(pipeName.c_str()),
+	m_regRootKey(regRootKey),
+	m_regEnabledKey(regEnabledKey)
 {
 }
 
@@ -12,6 +16,13 @@ Application::~Application()
 RZRESULT Application::CreateEffect(RZDEVICEID DeviceId, ChromaSDK::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId)
 {
 	LOG(L_INFO) << __FUNCTION__;
+
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
+
 	return RZRESULT_INVALID;
 }
 
@@ -19,6 +30,11 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 {
 	LOG(L_INFO) << __FUNCTION__ << ": " << Effect;
 
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
 	// note: changes in order of the m_pipe writes requires changes to the csharp wrapper as well
 	m_pipe.WriteInt(Application::DataType::Keyboard);
 
@@ -249,42 +265,88 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 RZRESULT Application::CreateHeadsetEffect(ChromaSDK::Headset::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId)
 {
 	LOG(L_INFO) << __FUNCTION__;
+
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
+
 	return RZRESULT_INVALID;
 }
 
 RZRESULT Application::CreateMousepadEffect(ChromaSDK::Mousepad::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId)
 {
 	LOG(L_INFO) << __FUNCTION__;
+
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
+
 	return RZRESULT_INVALID;
 }
 
 RZRESULT Application::CreateMouseEffect(ChromaSDK::Mouse::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId)
 {
 	LOG(L_INFO) << __FUNCTION__;
+	
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
+
 	return RZRESULT_INVALID;
 }
 
 RZRESULT Application::CreateKeypadEffect(ChromaSDK::Keypad::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId)
 {
 	LOG(L_INFO) << __FUNCTION__;
+
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
+
 	return RZRESULT_INVALID;
 }
 
 RZRESULT Application::SetEffect(RZEFFECTID EffectId)
 {
 	LOG(L_INFO) << __FUNCTION__;
+	
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
+
 	return RZRESULT_INVALID;
 }
 
 RZRESULT Application::DeleteEffect(RZEFFECTID EffectId)
 {
 	LOG(L_INFO) << __FUNCTION__;
+
+	// if we aren't enabled, this operation isn't allowed
+	if (!IsEnabled())
+	{
+		return RZRESULT_INVALID;
+	}
+
 	return RZRESULT_INVALID;
 }
 
 RZRESULT Application::QueryDevice(RZDEVICEID DeviceId, ChromaSDK::DEVICE_INFO_TYPE &DeviceInfo)
 {
 	LOG(L_INFO) << __FUNCTION__;
+
+	// we skip the enabled check for querying of devices because we want enable/disable to take
+	// effect on the fly, which won't happen if we are disabled, don't report and devices, and then
+	// we become enabled.
 
 	// only support 2 devices, one mouse and one keyboard
 	// as we extend this library to support more device types
@@ -302,4 +364,27 @@ RZRESULT Application::QueryDevice(RZDEVICEID DeviceId, ChromaSDK::DEVICE_INFO_TY
 	DeviceInfo.Connected = 1;
 
 	return RZRESULT_SUCCESS;
+}
+
+bool Application::IsEnabled() const
+{
+	int data;
+	DWORD dataSize;
+	LSTATUS status = RegGetValueA(
+		HKEY_CURRENT_USER,
+		m_regRootKey.c_str(),
+		m_regEnabledKey.c_str(),
+		RRF_RT_REG_DWORD,
+		NULL,
+		(PVOID)&data,
+		(LPDWORD)&dataSize);
+
+	if (status != ERROR_SUCCESS)
+	{
+		return false;
+	}
+	else
+	{
+		return data == 1;
+	}
 }

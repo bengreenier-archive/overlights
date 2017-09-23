@@ -30,6 +30,9 @@ namespace Overlights
             InitializeComponent();
             ResizeTableToRuntimeRequirements();
 
+            // configure the enabled menu appropriately
+            pluginMenuEnabled.Checked = RzChromaPlugin.Enabled;
+
             hueThread = new Thread(HuelightThreadAsync);
             hueThread.Start();
 
@@ -65,15 +68,13 @@ namespace Overlights
             hueClient = client;
         }
 
-        private void CommunicationThread(object state)
+        private async void CommunicationThread(object state)
         {
-            var client = new NamedPipeClientStream(".", "RzChromaData", PipeDirection.In);
-
-            client.Connect();
-
+            var client = await RzChromaPlugin.CreateStreamAsync();
+            
             using (var sr = new RzChromaStreamReader(client))
             {
-                while (client.IsConnected)
+                while (client.CanRead)
                 {
                     var msg = sr.ReadMessage();
 
@@ -229,13 +230,13 @@ namespace Overlights
             }
         }
 
-        private void hueToolStripMenuItem_Click(object sender, EventArgs e)
+        private void HueMenuSetup_Click(object sender, EventArgs e)
         {
             var huePage = new HueSetupPage();
             huePage.Show();
         }
 
-        private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
+        private void HueMenuClearAll_Click(object sender, EventArgs e)
         {
             for (var i = 0; i < this.keyLayout.RowCount; i++)
             {
@@ -245,6 +246,15 @@ namespace Overlights
                     this.keyLayout.GetControlFromPosition(j, i).Tag = null;
                 }
             }
+        }
+
+        private void PluginMenuEnabled_Click(object sender, EventArgs e)
+        {
+            var menu = sender as ToolStripMenuItem;
+
+            RzChromaPlugin.Enabled = !menu.Checked;
+
+            menu.Checked = !menu.Checked;
         }
     }
 }
