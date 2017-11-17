@@ -1,7 +1,8 @@
 #include "application.h"
 
 Application::Application(std::string pipeName) :
-	m_pipe(pipeName.c_str())
+	m_pipeServer(pipeName.c_str()),
+	m_binaryWriter(&m_pipeServer)
 {
 }
 
@@ -19,15 +20,15 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 {
 	LOG(L_INFO) << __FUNCTION__ << ": " << Effect;
 
-	// note: changes in order of the m_pipe writes requires changes to the csharp wrapper as well
-	m_pipe.WriteInt(Application::DataType::Keyboard);
+	// note: changes in order of the m_binaryWriter writes requires changes to the csharp wrapper as well
+	m_binaryWriter.WriteInt(Application::DataType::Keyboard);
 
 	if (Effect == ChromaSDK::Keyboard::EFFECT_TYPE::CHROMA_BREATHING)
 	{
 		ChromaSDK::Keyboard::BREATHING_EFFECT_TYPE *effect = (struct ChromaSDK::Keyboard::BREATHING_EFFECT_TYPE *)pParam;
 
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_BREATHING);
-		m_pipe.WriteInt(effect->Type);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_BREATHING);
+		m_binaryWriter.WriteInt(effect->Type);
 		
 		{
 			auto color = effect->Color1;
@@ -37,10 +38,10 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 			unsigned char red = GetRValue(color);
 			unsigned char alpha = (color >> 24) & 0xFF;
 
-			m_pipe.WriteByte(red);
-			m_pipe.WriteByte(green);
-			m_pipe.WriteByte(blue);
-			m_pipe.WriteByte(alpha);
+			m_binaryWriter.WriteByte(red);
+			m_binaryWriter.WriteByte(green);
+			m_binaryWriter.WriteByte(blue);
+			m_binaryWriter.WriteByte(alpha);
 		}
 
 		{
@@ -51,13 +52,15 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 			unsigned char red = GetRValue(color);
 			unsigned char alpha = (color >> 24) & 0xFF;
 
-			m_pipe.WriteByte(red);
-			m_pipe.WriteByte(green);
-			m_pipe.WriteByte(blue);
-			m_pipe.WriteByte(alpha);
+			m_binaryWriter.WriteByte(red);
+			m_binaryWriter.WriteByte(green);
+			m_binaryWriter.WriteByte(blue);
+			m_binaryWriter.WriteByte(alpha);
 		}
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
@@ -66,9 +69,9 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 	{
 		ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE *effect = (struct ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE *)pParam;
 
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_CUSTOM);
-		m_pipe.WriteInt(ChromaSDK::Keyboard::MAX_ROW);
-		m_pipe.WriteInt(ChromaSDK::Keyboard::MAX_COLUMN);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_CUSTOM);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::MAX_ROW);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::MAX_COLUMN);
 
 		for (auto i = 0; i < ChromaSDK::Keyboard::MAX_ROW; ++i)
 		{
@@ -81,14 +84,16 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 				unsigned char red = GetRValue(color);
 				unsigned char alpha = (color >> 24) & 0xFF;
 
-				m_pipe.WriteByte(red);
-				m_pipe.WriteByte(green);
-				m_pipe.WriteByte(blue);
-				m_pipe.WriteByte(alpha);
+				m_binaryWriter.WriteByte(red);
+				m_binaryWriter.WriteByte(green);
+				m_binaryWriter.WriteByte(blue);
+				m_binaryWriter.WriteByte(alpha);
 			}
 		}
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
@@ -97,9 +102,9 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 	{
 		ChromaSDK::Keyboard::CUSTOM_KEY_EFFECT_TYPE *effect = (struct ChromaSDK::Keyboard::CUSTOM_KEY_EFFECT_TYPE *)pParam;
 		
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_CUSTOM_KEY);
-		m_pipe.WriteInt(ChromaSDK::Keyboard::MAX_ROW);
-		m_pipe.WriteInt(ChromaSDK::Keyboard::MAX_COLUMN);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_CUSTOM_KEY);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::MAX_ROW);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::MAX_COLUMN);
 
 		for (auto i = 0; i < ChromaSDK::Keyboard::MAX_ROW; ++i)
 		{
@@ -112,14 +117,16 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 				unsigned char red = GetRValue(color);
 				unsigned char alpha = (color >> 24) & 0xFF;
 
-				m_pipe.WriteByte(red);
-				m_pipe.WriteByte(green);
-				m_pipe.WriteByte(blue);
-				m_pipe.WriteByte(alpha);
+				m_binaryWriter.WriteByte(red);
+				m_binaryWriter.WriteByte(green);
+				m_binaryWriter.WriteByte(blue);
+				m_binaryWriter.WriteByte(alpha);
 			}
 		}
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
@@ -130,9 +137,11 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 	}
 	else if (Effect == ChromaSDK::Keyboard::EFFECT_TYPE::CHROMA_NONE)
 	{
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_NONE);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_NONE);
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
@@ -141,8 +150,8 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 	{
 		ChromaSDK::Keyboard::REACTIVE_EFFECT_TYPE *effect = (struct ChromaSDK::Keyboard::REACTIVE_EFFECT_TYPE *)pParam;
 
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_REACTIVE);
-		m_pipe.WriteInt(effect->Duration);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_REACTIVE);
+		m_binaryWriter.WriteInt(effect->Duration);
 
 		auto color = effect->Color;
 
@@ -151,21 +160,25 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 		unsigned char red = GetRValue(color);
 		unsigned char alpha = (color >> 24) & 0xFF;
 
-		m_pipe.WriteByte(red);
-		m_pipe.WriteByte(green);
-		m_pipe.WriteByte(blue);
-		m_pipe.WriteByte(alpha);
+		m_binaryWriter.WriteByte(red);
+		m_binaryWriter.WriteByte(green);
+		m_binaryWriter.WriteByte(blue);
+		m_binaryWriter.WriteByte(alpha);
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
 	}
 	else if (Effect == ChromaSDK::Keyboard::EFFECT_TYPE::CHROMA_SPECTRUMCYCLING)
 	{
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_SPECTRUMCYCLING);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_SPECTRUMCYCLING);
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
@@ -174,9 +187,9 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 	{
 		ChromaSDK::Keyboard::STARLIGHT_EFFECT_TYPE *effect = (struct ChromaSDK::Keyboard::STARLIGHT_EFFECT_TYPE *)pParam;
 
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_STARLIGHT);
-		m_pipe.WriteInt(effect->Type);
-		m_pipe.WriteInt(effect->Duration);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_STARLIGHT);
+		m_binaryWriter.WriteInt(effect->Type);
+		m_binaryWriter.WriteInt(effect->Duration);
 
 		{
 			auto color = effect->Color1;
@@ -186,10 +199,10 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 			unsigned char red = GetRValue(color);
 			unsigned char alpha = (color >> 24) & 0xFF;
 
-			m_pipe.WriteByte(red);
-			m_pipe.WriteByte(green);
-			m_pipe.WriteByte(blue);
-			m_pipe.WriteByte(alpha);
+			m_binaryWriter.WriteByte(red);
+			m_binaryWriter.WriteByte(green);
+			m_binaryWriter.WriteByte(blue);
+			m_binaryWriter.WriteByte(alpha);
 		}
 
 		{
@@ -200,13 +213,15 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 			unsigned char red = GetRValue(color);
 			unsigned char alpha = (color >> 24) & 0xFF;
 
-			m_pipe.WriteByte(red);
-			m_pipe.WriteByte(green);
-			m_pipe.WriteByte(blue);
-			m_pipe.WriteByte(alpha);
+			m_binaryWriter.WriteByte(red);
+			m_binaryWriter.WriteByte(green);
+			m_binaryWriter.WriteByte(blue);
+			m_binaryWriter.WriteByte(alpha);
 		}
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
@@ -220,13 +235,15 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 		unsigned char red = GetRValue(effect->Color);
 		unsigned char alpha = (effect->Color >> 24) & 0xFF;
 
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_STATIC);
-		m_pipe.WriteByte(red);
-		m_pipe.WriteByte(green);
-		m_pipe.WriteByte(blue);
-		m_pipe.WriteByte(alpha);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_STATIC);
+		m_binaryWriter.WriteByte(red);
+		m_binaryWriter.WriteByte(green);
+		m_binaryWriter.WriteByte(blue);
+		m_binaryWriter.WriteByte(alpha);
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}
@@ -234,10 +251,12 @@ RZRESULT Application::CreateKeyboardEffect(ChromaSDK::Keyboard::EFFECT_TYPE Effe
 	else if (Effect == ChromaSDK::Keyboard::EFFECT_TYPE::CHROMA_WAVE)
 	{
 		ChromaSDK::Keyboard::WAVE_EFFECT_TYPE *effect = (struct ChromaSDK::Keyboard::WAVE_EFFECT_TYPE *)pParam;
-		m_pipe.WriteInt(ChromaSDK::Keyboard::CHROMA_WAVE);
-		m_pipe.WriteInt(effect->Direction);
+		m_binaryWriter.WriteInt(ChromaSDK::Keyboard::CHROMA_WAVE);
+		m_binaryWriter.WriteInt(effect->Direction);
 
-		if (!m_pipe.Flush())
+		// since the binary writer is writing to the pipe server, now we force flush that data
+		// as we've written a complete single message
+		if (!m_pipeServer.Flush())
 		{
 			return RZRESULT_INVALID;
 		}

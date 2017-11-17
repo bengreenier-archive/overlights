@@ -65,7 +65,7 @@ namespace Overlights
             hueClient = client;
         }
 
-        private void CommunicationThread(object state)
+        private async void CommunicationThread(object state)
         {
             var client = new NamedPipeClientStream(".", "RzChromaData", PipeDirection.In);
 
@@ -75,7 +75,7 @@ namespace Overlights
             {
                 while (client.IsConnected)
                 {
-                    var msg = sr.ReadMessage();
+                    var msg = await sr.ReadMessageAsync();
 
                     if (msg.Type == DataType.Keyboard)
                     {

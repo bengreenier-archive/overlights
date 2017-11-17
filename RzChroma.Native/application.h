@@ -12,7 +12,8 @@
 #include "RzChromaSDKDefines.h"
 #include "logger.h"
 #include "helpers.h"
-#include "binary_pipe.h"
+#include "pipe_server.h"
+#include "binary_writer.h"
 
 #ifndef APP_PIPE_NAME
 #define APP_PIPE_NAME "RzChromaData"
@@ -137,8 +138,13 @@ public:
 private:
 
 	/// <summary>
-	/// Internal <see cref="BinaryPipe"/> instance used for communication
+	/// Internal <see cref="PipeServer"/> instance used for communication
 	/// </summary>
-	BinaryPipe m_pipe;
+	PipeServer m_pipeServer;
+
+	/// <summary>
+	/// Internal <see cref="BinaryWriter"/> instance used to write data as binary to the <c>m_pipeServer</c>
+	/// </summary>
+	BinaryWriter m_binaryWriter;
 };
 

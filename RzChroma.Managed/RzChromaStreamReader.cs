@@ -57,6 +57,18 @@ namespace RzChroma
             return data;
         }
 
+        /// <summary>
+        /// Task-based version of <see cref="ReadMessage"/>
+        /// </summary>
+        /// <returns>Task that resolves to <see cref="IData"/></returns>
+        public Task<IData> ReadMessageAsync()
+        {
+            return Task.Run(() =>
+            {
+                return this.ReadMessage();
+            });
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
